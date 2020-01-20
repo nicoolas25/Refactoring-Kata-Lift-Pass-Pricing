@@ -60,53 +60,20 @@ public class Prices {
             } else {
 
                 if (!req.queryParams("type").equals("night")) {
-                    DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-                    List<Date> holidaysDates = new ArrayList<>();
-                    try (PreparedStatement holidayStmt = connection.prepareStatement( //
-                            "SELECT * FROM holidays")) {
-                        try (ResultSet holidays = holidayStmt.executeQuery()) {
-
-                            while (holidays.next()) {
-                                holidaysDates.add(holidays.getDate("holiday"));
-                            }
-                        }
-                    }
-
-                    int reduction = 0;
-                    boolean isHoliday = false;
-                    for (Date holiday : holidaysDates) {
-                        if (req.queryParams("date") != null) {
-                            Date d = isoFormat.parse(req.queryParams("date"));
-                            if (d.getYear() == holiday.getYear() && //
-                                    d.getMonth() == holiday.getMonth() && //
-                                    d.getDate() == holiday.getDate()) {
-                                isHoliday = true;
-                            }
-                        }
-                    }
-
-                    if (req.queryParams("date") != null) {
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.setTime(isoFormat.parse(req.queryParams("date")));
-                        if (!isHoliday && calendar.get(Calendar.DAY_OF_WEEK) == 2) {
-                            reduction = 35;
-                        }
-                    }
 
                     // TODO apply reduction for others
                     if (age != null && age < 15) {
                         return "{ \"cost\": " + (int) Math.ceil(basePrice * .7) + "}";
                     } else {
                         if (age == null) {
-                            double cost = basePrice * (1 - reduction / 100.0);
+                            double cost = basePrice ;
                             return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
                         } else {
                             if (age > 64) {
-                                double cost = basePrice * .75 * (1 - reduction / 100.0);
+                                double cost = basePrice  * (1 - 25 / 100.0);
                                 return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
                             } else {
-                                double cost = basePrice * (1 - reduction / 100.0);
+                                double cost = basePrice ;
                                 return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
                             }
                         }
