@@ -49,7 +49,6 @@ namespace LiftPassPricing
                     double result = (int)costCmd.ExecuteScalar();
 
                     int reduction;
-                    var isHoliday = false;
 
                     if (age != null && age < 6)
                     {
@@ -57,43 +56,10 @@ namespace LiftPassPricing
                     }
                     else
                     {
-                        reduction = 0;
 
                         if (!"night".Equals(this.Request.Query["type"]))
                         {
-                            using (var holidayCmd = new MySqlCommand( //
-                                "SELECT * FROM holidays", connection))
-                            {
-                                holidayCmd.Prepare();
-                                using (var holidays = holidayCmd.ExecuteReader())
-                                {
 
-                                    while (holidays.Read())
-                                    {
-                                        var holiday = holidays.GetDateTime("holiday");
-                                        if (this.Request.Query["date"] != null)
-                                        {
-                                            DateTime d = DateTime.ParseExact(this.Request.Query["date"], "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                                            if (d.Year == holiday.Year &&
-                                                d.Month == holiday.Month &&
-                                                d.Date == holiday.Date)
-                                            {
-                                                isHoliday = true;
-                                            }
-                                        }
-                                    }
-
-                                }
-                            }
-
-                            if (this.Request.Query["date"] != null)
-                            {
-                                DateTime d = DateTime.ParseExact(this.Request.Query["date"], "yyyy-MM-dd", CultureInfo.InvariantCulture);
-                                if (!isHoliday && (int)d.DayOfWeek == 1)
-                                {
-                                    reduction = 35;
-                                }
-                            }
 
                             // TODO apply reduction for others
                             if (age != null && age < 15)
@@ -104,19 +70,19 @@ namespace LiftPassPricing
                             {
                                 if (age == null)
                                 {
-                                    double cost = result * (1 - reduction / 100.0);
+                                    double cost = result;
                                     return "{ \"cost\": " + (int)Math.Ceiling(cost) + "}";
                                 }
                                 else
                                 {
                                     if (age > 64)
                                     {
-                                        double cost = result * .75 * (1 - reduction / 100.0);
+                                        double cost = result * .75;
                                         return "{ \"cost\": " + (int)Math.Ceiling(cost) + "}";
                                     }
                                     else
                                     {
-                                        double cost = result * (1 - reduction / 100.0);
+                                        double cost = result ;
                                         return "{ \"cost\": " + (int)Math.Ceiling(cost) + "}";
                                     }
                                 }
