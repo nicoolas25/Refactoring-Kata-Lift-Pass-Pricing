@@ -1,9 +1,18 @@
 import pytest
-
 from fastapi.testclient import TestClient
+
 from main import app
 
 client = TestClient(app)
+
+def test_1jour_no_age_given():
+    response = client.get(f"/prices?type=1jour")
+    assert response.json() == {"cost": 35}
+
+
+def test_night_no_age_given():
+    response = client.get(f"/prices?type=night")
+    assert response.json() == {"cost": 19}
 
 
 @pytest.mark.parametrize(
